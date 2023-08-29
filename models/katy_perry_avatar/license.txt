@@ -1,0 +1,11 @@
+Model Information:
+* title:	Katy Perry Avatar
+* source:	https://sketchfab.com/3d-models/katy-perry-avatar-a898ba7bd6aa451cb4698701c222038b
+* author:	Jasnoor Singh (https://sketchfab.com/jasnoor.harry)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Katy Perry Avatar" (https://sketchfab.com/3d-models/katy-perry-avatar-a898ba7bd6aa451cb4698701c222038b) by Jasnoor Singh (https://sketchfab.com/jasnoor.harry) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
