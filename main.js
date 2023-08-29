@@ -28,18 +28,18 @@
   function init() {
     const MODEL_PATH = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/1376484/blender-tut-stacy.glb' //'./models/katy_perry_avatar.glb'
     const canvas = document.querySelector('#c')
-    const backgroundColor = '#ccc'
+    // const backgroundColor = '#ccc'
 
     // 初始化场景
     scene = new THREE.Scene()
-    scene.background = new THREE.Color(backgroundColor)
-    scene.fog = new THREE.Fog(backgroundColor, 60, 100) // 背景中间的虚化效果
+    // scene.background = new THREE.Color(backgroundColor)
+    // scene.fog = new THREE.Fog(backgroundColor, 60, 100) // 背景中间的虚化效果
 
     // 初始化渲染器（renderer）
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true }) // 设置场景背景透明
     renderer.shadowMap.enabled = true // 人物投影
     renderer.setPixelRatio(window.devicePixelRatio) // 基于设备设置像素比
-    document.body.appendChild(renderer.domElement)
+    // document.body.appendChild(renderer.domElement)
 
     // 添加透视摄像机
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -54,9 +54,9 @@
     stacy_txt.flipY = false
     // 材质
     const stacy_mtl = new THREE.MeshPhongMaterial({
-      map: stacy_txt,
-      color: '#fff',
-      skinning: true
+      map: stacy_txt, // 模型材质贴图
+      // color: '#fff',
+      skinning: true // 启用模型的骨骼动画
     })
 
     // 3d模型加载器
@@ -146,10 +146,15 @@
     let floorGeometry = new THREE.PlaneGeometry(5000, 5000, 1, 1) // 地板的大小
     // 地板的材质
     let floorMaterial = new THREE.MeshPhongMaterial({
-      color: '#aaa',
-      shininess: 0
+      // color: '#aaa',
+      // shininess: 0,
+      transparent: true, // 启用透明
+      opacity: 0 // 设置透明度
     })
-
+    // 这个好像去掉没有影响
+    // 设置地板的混合模式和混合函数，以实现透明效果
+    // floorMaterial.blending = THREE.NormalBlending // 混合模式
+    // floorMaterial.depthWrite = false // 禁止写入深度缓冲，确保透明物体不会遮挡其他物体
     // 给场景添加地板
     let floor = new THREE.Mesh(floorGeometry, floorMaterial)
     floor.rotation.x = -0.5 * Math.PI
@@ -158,16 +163,16 @@
     scene.add(floor)
 
     // 生成一个球体
-    let geometry = new THREE.SphereGeometry(8, 32, 32)
-    // 球体的材质
-    let material = new THREE.MeshBasicMaterial({ color: '#f2ccff' }) // 0xf2ce2e
-    // 混合球体和材质生成一个球
-    let sphere = new THREE.Mesh(geometry, material)
+    // let geometry = new THREE.SphereGeometry(8, 32, 32)
+    // // 球体的材质
+    // let material = new THREE.MeshBasicMaterial({ color: '#f2ccff' }) // 0xf2ce2e
+    // // 混合球体和材质生成一个球
+    // let sphere = new THREE.Mesh(geometry, material)
 
-    sphere.position.z = -15
-    sphere.position.y = -2.5
-    sphere.position.x = -0.25
-    scene.add(sphere)
+    // sphere.position.z = -15
+    // sphere.position.y = -2.5
+    // sphere.position.x = -0.25
+    // scene.add(sphere)
   }
 
   /**
@@ -213,19 +218,25 @@
     return needResize
   }
 
-  // 添加事件监听，分别对应pc和触屏
-  window.addEventListener('click', e => raycast(e))
-  window.addEventListener('touchend', e => raycast(e, true))
+  // 给canvas元素添加事件监听，分别对应pc和触屏
+  const canvas = document.querySelector('#c') // 获取Canvas元素
+  canvas.addEventListener('click', e => raycast(e))
+  canvas.addEventListener('touchend', e => raycast(e, true))
+
+  // window.addEventListener('click', e => raycast(e))
+  // window.addEventListener('touchend', e => raycast(e, true))
 
   // 采用射线实现点击，从摄像机向鼠标位置发射激光束，返回被击中的对象
   function raycast(e, touch = false) {
+    var rect = canvas.getBoundingClientRect()
     var mouse = {}
+
     if (touch) {
-      mouse.x = 2 * (e.changedTouches[0].clientX / window.innerWidth) - 1
-      mouse.y = 1 - 2 * (e.changedTouches[0].clientY / window.innerHeight)
+      mouse.x = ((e.changedTouches[0].clientX - rect.left) / canvas.clientWidth) * 2 - 1
+      mouse.y = -((e.changedTouches[0].clientY - rect.top) / canvas.clientHeight) * 2 + 1
     } else {
-      mouse.x = 2 * (e.clientX / window.innerWidth) - 1
-      mouse.y = 1 - 2 * (e.clientY / window.innerHeight)
+      mouse.x = ((e.clientX - rect.left) / canvas.clientWidth) * 2 - 1
+      mouse.y = -((e.clientY - rect.top) / canvas.clientHeight) * 2 + 1
     }
     // 用相机和鼠标的位置更新射线
     // update the picking ray with the camera and mouse position
@@ -273,7 +284,7 @@
     }, to._clip.duration * 1000 - (tSpeed + fSpeed) * 1000)
   }
 
-  // 在鼠标移动的时候获取鼠标位置并执行动画
+  // 在鼠标移动的时候获取鼠标位置并移动关节
   document.addEventListener('mousemove', function (e) {
     var mousecoords = getMousePos(e)
     if (neck && waist) {
