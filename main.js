@@ -43,9 +43,9 @@
 
     // 添加透视摄像机
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
-    camera.position.z = 30
+    camera.position.z = 16
     camera.position.x = 0
-    camera.position.y = -3
+    camera.position.y = -4.5
 
     // 创建纹理贴图
     let stacy_txt = new THREE.TextureLoader().load(
@@ -288,8 +288,8 @@
   document.addEventListener('mousemove', function (e) {
     var mousecoords = getMousePos(e)
     if (neck && waist) {
-      moveJoint(mousecoords, neck, 50)
-      moveJoint(mousecoords, waist, 30)
+      moveJoint(mousecoords, neck, 3)
+      moveJoint(mousecoords, waist, 1)
     }
   })
   // 获取鼠标位置
@@ -298,7 +298,7 @@
   }
 
   /**
-   *
+   * 移动关节使其旋转来对其鼠标的位置
    * @param {*} mouse 当前鼠标的位置
    * @param {*} joint 需要移动的关节
    * @param {*} degreeLimit 允许关节旋转的角度范围
@@ -306,16 +306,16 @@
   function moveJoint(mouse, joint, degreeLimit) {
     let degrees = getMouseDegrees(mouse.x, mouse.y, degreeLimit)
     joint.rotation.y = THREE.Math.degToRad(degrees.x)
-    joint.rotation.x = THREE.Math.degToRad(degrees.y)
+    joint.rotation.x = THREE.Math.degToRad(degrees.y * 10)
   }
 
   /**
    * 判断鼠标位于视口上半部、下半部、左半部和右半部的具体位置
    * 根据鼠标与视口的距离百分比，再计算基于degreeLimit的百分比，最后返回
-   * @param {*} x
-   * @param {*} y
-   * @param {*} degreeLimit
-   * @returns
+   * @param {*} x 横向位置
+   * @param {*} y 纵向位置
+   * @param {*} degreeLimit 关节的旋转角度限制
+   * @returns {x,y} xy方向上的旋转角度
    */
   function getMouseDegrees(x, y, degreeLimit) {
     let dx = 0,
@@ -325,8 +325,15 @@
       ydiff,
       yPercentage
 
-    let w = { x: window.innerWidth, y: window.innerHeight }
+    // 获取元素的边界框信息
+    const rect = document.getElementById('c').getBoundingClientRect()
+    // 设置中心点
+    let w = { x: (rect.left + rect.right) / 2, y: (rect.top + rect.bottom) / 2 }
+    // w = { x: 100, y: 100 }
+    console.log(1111111111111)
+    console.log(w)
 
+    // 判断上下左右的转动幅度
     // Left (Rotates neck left between 0 and -degreeLimit)
     // 1. If cursor is in the left half of screen
     if (x <= w.x / 2) {
